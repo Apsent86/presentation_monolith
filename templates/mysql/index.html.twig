@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mysql Demo{% endblock %}
+{% block inner_script %}
+  <script>
+
+    fetch('api/mysql')
+      .then(r => {
+          return r.json()
+        }
+      ).then(data => {
+
+      const config = {
+        type: 'line',
+        data: data,
+        options: {}
+      };
+
+      const myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+      );
+      console.log(data)
+    }).catch(e => alert('Something wrong'))
+
+  </script>
+{% endblock inner_script %}

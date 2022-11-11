@@ -1,0 +1,65 @@
+doctrine:
+    dbal:
+        default_connection: mysql
+        connections:
+            mysql:
+                url: '%env(resolve:DATABASE_URL)%'
+            clickhouse:
+                host: '%env(resolve:CLICKHOUSE_HOST)%'
+                port: '%env(resolve:CLICKHOUSE_PORT)%'
+                user: '%env(resolve:CLICKHOUSE_USER)%'
+                password: '%env(resolve:CLICKHOUSE_PASSWORD)%'
+                dbname: '%env(resolve:CLICKHOUSE_DB)%'
+                driver_class: FOD\DBALClickHouse\Driver
+                wrapper_class: FOD\DBALClickHouse\Connection
+                options:
+                    enable_http_compression: 1
+                    max_execution_time: 300
+    orm:
+        default_entity_manager: mysql
+        auto_generate_proxy_classes: true
+        entity_managers:
+            mysql:
+                auto_mapping: true
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                connection: mysql
+                mappings:
+                    App:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App
+            clickhouse:
+                connection: clickhouse
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                mappings:
+                    ClickHouse:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/ClickHouse'
+                        prefix: 'App\Entity\ClickHouse'
+                        alias: ClickHouse
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

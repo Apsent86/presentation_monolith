@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clickhouse Demo{% endblock %}
+
+        {% block body %}
+          <main class="flex-shrink-0">
+            <div class="container">
+              <h2>Clickhouse test data</h2>
+              <div style="height: 900px; width: 1000px">
+                <canvas id="myChart"></canvas>
+              </div>
+            </div>
+          </main>
+        {% endblock %}
+
+{% block inner_script %}
+  <script>
+
+    fetch('api/clickhouse')
+      .then(r => {
+          return r.json()
+        }
+      ).then(data => {
+
+      const config = {
+        type: 'line',
+        data: data,
+        options: {}
+      };
+
+      const myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+      );
+      console.log(data)
+    }).catch(e => alert('Something wrong'))
+
+  </script>
+{% endblock inner_script %}
